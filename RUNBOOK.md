@@ -7,6 +7,12 @@ fails, the "if it fails" line tells you where to look.
 
 Nothing before Part 8 costs money or needs an API key.
 
+> **The data in this repository is synthetic.** The commands below were
+> written for `data/CARL-01.pdf`, the original evaluation document, which is
+> not included, and the expected numbers they quote come from it. To try any
+> command here, use `--pdf data/sample/SAMPLE-01.pdf --issuer ESA --jurisdiction EX`
+> instead; the counts will differ.
+
 ---
 
 ## Step 0 — Set up
@@ -363,15 +369,15 @@ for i in run['items']:
 **You should see** Federal Law No. 28 in clause 5.1 and ECAS General
 Requirements in clause 8.1 resolved to their catalogue entries.
 
-`data/corpus_catalog.json` stands in for documents already ingested: the two
-documents CARL-01 cites, plus four labelled synthetic near-misses. About two
-hundred unrelated titles from `data/distractor_titles.txt` are mixed in as
-noise.
+`data/corpus_catalog.json` stands in for documents already ingested. The
+synthetic catalogue shipped here holds the two documents SAMPLE-01 cites and
+three labelled synthetic near-misses, and 160 unrelated titles from
+`data/distractor_titles.txt` are mixed in as noise.
 
-Section 5 of the eval report runs eight hand-written cases against the
-catalogue with and without the noise. **You should see** accuracy 1.0 on both
-and 0 wrong links — including "Federal Law No. 2", which only the number check
-refuses.
+Section 5 of the eval report runs the hand-written cases in
+`gold/resolution.json` (five in this repository) against the catalogue with
+and without the noise. **You should see** 0 wrong links: a near-miss whose
+number differs is refused by the number check and reported as NOT_FOUND.
 
 With Qdrant as the backend:
 

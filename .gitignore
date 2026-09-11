@@ -225,4 +225,6 @@ cassettes/
 my_decisions.json
 gold/reviewer_corrections.jsonl
 # The original evaluation document and its data are not part of this repository.
+# Keep them in private/ and point to them with the settings in the README.
 data/CARL-01.pdf
+private/

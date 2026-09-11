@@ -352,6 +352,6 @@ def evaluate_resolution(settings: Settings, gold_path: Path) -> dict:
         "wrong_links": sum(1 for r in rows for key in ("clean", "noisy")
                            if r[key] and r[key] != r["expected"]),
         "catalog": {"clean": len(clean.entries), "noisy": len(noisy.entries)},
-        "caveat": ("Eight hand-written cases. They show the floor and the number check "
+        "caveat": ("A few hand-written cases. They show the floor and the number check "
                    "doing their job under noise; they are not a recall measurement."),
     }

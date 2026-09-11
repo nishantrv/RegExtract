@@ -337,7 +337,7 @@ def evaluate_section_5(items: list[Item], gold_path: Path) -> dict:
         "abstention_violations": {k: v for k, v in abstention.items() if v},
         "grounding_rate": round(grounded / len(scoped), 4) if scoped else 0.0,
         "caveat": (
-            "n is about a dozen. These numbers show the harness computes "
+            "n is small. These numbers show the harness computes "
             "precision and recall correctly. They are not a quality claim."
         ),
     }
