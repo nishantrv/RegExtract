@@ -216,3 +216,13 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# --- regextract -------------------------------------------------------------
+.env
+outputs/
+cassettes/
+.deepeval/
+my_decisions.json
+gold/reviewer_corrections.jsonl
+# The original evaluation document and its data are not part of this repository.
+data/CARL-01.pdf

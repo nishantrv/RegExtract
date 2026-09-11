@@ -1,0 +1,10 @@
+{
+  "_about": "SYNTHETIC reference-resolution cases for the synthetic catalogue. `expected` is a catalogue id, or null when the correct answer is NOT_FOUND. Evaluated twice: against the catalogue alone, and with the synthetic distractor titles mixed in.",
+  "queries": [
+    {"query": "Water Safety Law No. 7 of 2020", "expected": "EX-WSL-7", "note": "SAMPLE-01 clauses 4.2 and 5.1"},
+    {"query": "Water Safety Law No 7 of 2020", "expected": "EX-WSL-7", "note": "a formatting variant still resolves"},
+    {"query": "Water Safety Law No. 70 of 2020", "expected": null, "note": "one digit away from a catalogue title; only the number check refuses it"},
+    {"query": "Water Safety Law No. 17 of 2020", "expected": null, "note": "mixes the numbers of two catalogue titles, matches neither"},
+    {"query": "Regulation on Swimming Pool Pumps", "expected": null, "note": "plausible, not in the corpus"}
+  ]
+}

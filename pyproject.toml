@@ -1,0 +1,12 @@
+[project]
+name = "regextract"
+version = "0.2.0"
+description = "Regulatory clause and entity extraction with verified evidence and review routing"
+requires-python = ">=3.11"
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+markers = ["carl01: needs the CARL-01 document or its original data"]
+
+[tool.setuptools.packages.find]
+include = ["regextract*"]

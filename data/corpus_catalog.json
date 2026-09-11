@@ -1,0 +1,44 @@
+{
+  "_about": "SYNTHETIC sample data. Stands in for documents already ingested into the corpus. All titles are invented to match the synthetic sample document data/sample/SAMPLE-01.pdf. Entries with cited_by use titles exactly as SAMPLE-01 cites them; entries marked synthetic are near-misses that resolution must refuse. At run time the titles in distractor_titles.txt are added as unrelated noise.",
+  "documents": [
+    {
+      "id": "EX-WSL-7",
+      "title": "Water Safety Law No. 7 of 2020",
+      "aliases": [],
+      "issuer": "Examplia",
+      "jurisdiction": "EX",
+      "kind": "law",
+      "cited_by": "SAMPLE-01 clauses 4.2 and 5.1"
+    },
+    {
+      "id": "EX-ESA-44-1",
+      "title": "ESA Standard 44-1:2019 Safety of household and similar pumps",
+      "aliases": ["Safety of household and similar pumps"],
+      "issuer": "ESA",
+      "jurisdiction": "EX",
+      "kind": "standard",
+      "cited_by": "SAMPLE-01 clause 4.1"
+    },
+    {
+      "id": "SYN-WSL-17",
+      "title": "Water Safety Law No. 17 of 2021",
+      "jurisdiction": "EX",
+      "kind": "law",
+      "synthetic": true
+    },
+    {
+      "id": "SYN-LABEL-GUIDE",
+      "title": "Guidance on Labelling of Garden Equipment",
+      "jurisdiction": "EX",
+      "kind": "guidance",
+      "synthetic": true
+    },
+    {
+      "id": "SYN-TOOLS",
+      "title": "General Requirements for Electric Garden Tools",
+      "jurisdiction": "EX",
+      "kind": "technical_regulation",
+      "synthetic": true
+    }
+  ]
+}

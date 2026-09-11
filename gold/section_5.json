@@ -1,0 +1,27 @@
+{
+  "_comment": [
+    "SYNTHETIC hand-labelled gold for section 5 (definitions) of the synthetic",
+    "sample document data/sample/SAMPLE-01.pdf. Labelled by reading the document,",
+    "not by copying pipeline output. Too few items for a quality claim: it is here",
+    "so the evaluation harness has something to compute precision and recall on."
+  ],
+  "document_id": "SAMPLE-01",
+  "scope": "clauses 5.1 through 5.5",
+  "entities": [
+    {"clause_id": "5.1", "type": "organisation",    "text": "Examplia Standards Authority"},
+    {"clause_id": "5.1", "type": "organisation",    "text": "ESA"},
+    {"clause_id": "5.1", "type": "legal_reference", "text": "Water Safety Law No. 7 of 2020"},
+    {"clause_id": "5.3", "type": "role",            "text": "manufacturer"},
+    {"clause_id": "5.3", "type": "role",            "text": "importer"},
+    {"clause_id": "5.3", "type": "location",        "text": "Examplia"}
+  ],
+  "cross_references": [
+    {"clause_id": "5.2", "scope": "internal", "target_clause_id": "3.1"}
+  ],
+  "must_be_empty": {
+    "_comment": "Abstention. Section 5 defines terms; it contains no money and no calendar dates.",
+    "monetary_threshold": true,
+    "date": true,
+    "individual": true
+  }
+}
