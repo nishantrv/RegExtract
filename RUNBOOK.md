@@ -675,3 +675,371 @@ against the previous run.
 | Truncated model output | `model_calls.errors`. Raise `REGEXTRACT_MAX_TOKENS` — it caps thinking and output together |
 | A reference not linked | The item's `resolution.reason` says which candidate came closest and why it was refused |
 | A review run will not resume | `run.py review` names the problem; the run id must match the paused run, and `--out` must match its output directory |
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+# Repository Pipelines
+
+## 1. Main Extraction Pipeline
+
+```mermaid
+flowchart LR
+    PDF[PDF] --> ING[Ingest]
+    ING --> SEG[Build clause tree]
+    SEG --> GUARD[Guardrails]
+    GUARD --> EXT[AI extraction]
+    EXT --> VER[Verify quotes]
+    VER --> RES[Resolve references]
+    RES --> ROUTE[Score and route]
+    ROUTE --> REVIEW[Human review]
+    REVIEW --> PUB[Publish and log]
+```
+
+```text
+PDF
+→ Clean text
+→ Build clauses
+→ Check hidden instructions
+→ Extract facts with AI
+→ Verify quotes in the source
+→ Link referenced documents
+→ Score facts
+→ Auto-publish or send to review
+→ Save results and audit log
+```
+
+```bash
+python run.py extract --pdf data/CARL-01.pdf
+```
+
+---
+
+## 2. Evaluation Pipeline
+
+```mermaid
+flowchart LR
+    PDF[PDF] --> PIPE[Run full pipeline]
+    PIPE --> CHECK[Run failure checks]
+    CHECK --> METRICS[Precision and recall]
+    METRICS --> REPORT[Evaluation report]
+```
+
+```text
+Run the pipeline
+→ Check nine known problems
+→ Check grounding
+→ Measure precision and recall
+→ Test reference linking
+→ Write the report
+```
+
+```bash
+python run.py evaluate --pdf data/CARL-01.pdf
+```
+
+---
+
+## 3. Fault-Injection Pipeline
+
+```mermaid
+flowchart LR
+    PDF[PDF] --> EXTRACT[Offline extraction]
+    EXTRACT --> FAKE[Insert fake quote text]
+    FAKE --> GATE[Grounding gate]
+    GATE --> REVIEW[Reject and review]
+```
+
+```text
+Run offline extraction
+→ Add fake information
+→ Search for the quote in the source
+→ Detect that it is missing
+→ Give the fact score 0
+→ Send it to review
+```
+
+```bash
+python run.py evaluate \
+  --pdf data/CARL-01.pdf \
+  --inject-faults \
+  --out outputs/faults
+```
+
+---
+
+## 4. Guardrail and Red-Team Pipeline
+
+```mermaid
+flowchart LR
+    CLAUSE[Clause] --> ATTACK[Add hidden instruction]
+    ATTACK --> SCAN[Regex scanner]
+    SCAN --> MODEL[Optional safety model]
+    MODEL --> REVIEW[Force review]
+    REVIEW --> REPORT[Red-team report]
+```
+
+```text
+Take real clauses
+→ Add suspicious instructions
+→ Scan with fixed patterns
+→ Optionally check with a safety model
+→ Flag suspicious clauses
+→ Send their facts to review
+→ Report caught and missed attacks
+```
+
+```bash
+python run.py redteam --pdf data/CARL-01.pdf
+```
+
+With the live safety model:
+
+```bash
+python run.py redteam \
+  --pdf data/CARL-01.pdf \
+  --live \
+  --guardrails
+```
+
+---
+
+## 5. Human Review Pipeline
+
+```mermaid
+flowchart LR
+    RUN[Pipeline run] --> PAUSE[Pause]
+    PAUSE --> QUEUE[Review queue]
+    QUEUE --> DECIDE[Accept, reject, or correct]
+    DECIDE --> VALIDATE[Validate decision]
+    VALIDATE --> PUB[Publish]
+    PUB --> LOG[Update publish log]
+```
+
+```text
+Run the pipeline
+→ Pause when facts need review
+→ Save the review queue
+→ Reviewer makes decisions
+→ Validate corrections
+→ Publish accepted facts
+→ Record everything in the log
+```
+
+```bash
+python run.py extract --pdf data/CARL-01.pdf --review
+```
+
+Resume it:
+
+```bash
+python run.py review \
+  --thread "<run-id>" \
+  --decisions decisions.json
+```
+
+---
+
+## 6. Reference-Linking Pipeline
+
+```mermaid
+flowchart LR
+    REF[External reference] --> KEY[Keyword search]
+    REF --> SEM[Meaning search]
+    KEY --> FUSE[RRF fusion]
+    SEM --> FUSE
+    FUSE --> RERANK[Rerank candidates]
+    RERANK --> NUMBER[Check numbers]
+    NUMBER --> RESULT[Link or NOT_FOUND]
+```
+
+```text
+Find a reference
+→ Search exact words
+→ Search similar meanings
+→ Combine both rankings
+→ Rerank candidates
+→ Check numbers exactly
+→ Return document ID or NOT_FOUND
+```
+
+Normal extraction runs this automatically:
+
+```bash
+python run.py extract --pdf data/CARL-01.pdf
+```
+
+With Qdrant:
+
+```bash
+python run.py extract \
+  --pdf data/CARL-01.pdf \
+  --qdrant
+```
+
+---
+
+## 7. Change-Detection Pipeline
+
+```mermaid
+flowchart LR
+    OLD[Old revision] --> MATCH[Match clauses]
+    NEW[New revision] --> MATCH
+    MATCH --> DIFF[Compare fact signatures]
+    DIFF --> EVENT[Change event]
+    EVENT --> LOG[Publish or review log]
+```
+
+```text
+Load old revision
+→ Load new revision
+→ Check hashes
+→ Match clauses by number and text
+→ Match renumbered clauses by text
+→ Compare facts
+→ Find added and removed facts
+→ Create change event
+```
+
+Create runs:
+
+```bash
+python run.py extract --pdf data/CARL-01.pdf --out outputs/rev4
+python run.py extract --pdf data/CARL-01-rev5.pdf --out outputs/rev5
+```
+
+Compare them:
+
+```bash
+python run.py diff \
+  --previous outputs/rev4/extractions.json \
+  --current outputs/rev5/extractions.json \
+  --out outputs/change_event.json
+```
+
+---
+
+## 8. Publish-Log Verification
+
+```mermaid
+flowchart LR
+    LOG[Publish log] --> HASH[Check entry hashes]
+    HASH --> LINK[Check previous-entry links]
+    LINK --> RESULT[Valid or broken chain]
+```
+
+```text
+Read the publish log
+→ Check each hash
+→ Check the connection to the previous entry
+→ Report whether the log was changed
+```
+
+```bash
+python run.py verify-log
+```
+
+---
+
+## 9. Automated-Test Pipeline
+
+```mermaid
+flowchart LR
+    CODE[Code] --> TEST[109 tests]
+    TEST --> GROUND[Grounding tests]
+    TEST --> ROUTE[Routing tests]
+    TEST --> GUARD[Guardrail tests]
+    TEST --> REVIEW[Review tests]
+    TEST --> DIFF[Diff tests]
+    GROUND --> RESULT[Pass or fail]
+    ROUTE --> RESULT
+    GUARD --> RESULT
+    REVIEW --> RESULT
+    DIFF --> RESULT
+```
+
+```text
+Run tests
+→ Test extraction and contracts
+→ Test quote verification
+→ Test scoring and routing
+→ Test guardrails
+→ Test review and publishing
+→ Test reference linking and diff
+→ Report results
+```
+
+```bash
+python -m pytest -q
+```
+
+---
+
+## 10. Offline and Live Model Pipelines
+
+### Offline
+
+```mermaid
+flowchart LR
+    CALL[Model request] --> CHECK{Cassette exists?}
+    CHECK -->|Yes| REPLAY[Replay response]
+    CHECK -->|No| STUB[Use rule-based stub]
+```
+
+```text
+Request a model response
+→ Check saved responses
+→ Replay one if available
+→ Otherwise use the offline stub
+→ Continue without API cost
+```
+
+```bash
+python run.py extract --pdf data/CARL-01.pdf
+```
+
+### Live
+
+```mermaid
+flowchart LR
+    CALL[Model request] --> API[Real AI provider]
+    API --> VALIDATE[Validate response]
+    VALIDATE --> RECORD[Optionally save cassette]
+```
+
+```text
+Request a model response
+→ Call the real provider
+→ Validate the response format
+→ Retry or fail closed if invalid
+→ Record model, tokens, and cost
+→ Save response if requested
+```
+
+```bash
+python run.py extract \
+  --pdf data/CARL-01.pdf \
+  --live \
+  --record
+```
+
+---
+
+## Complete Repository Flow
+
+```text
+PDF
+→ Ingest
+→ Structure
+→ Guard
+→ Extract
+→ Verify
+→ Resolve
+→ Score
+→ Route
+→ Review
+→ Publish
+→ Verify log
+→ Compare future revisions
+→ Evaluate and test continuously
+```
